@@ -1,16 +1,23 @@
 extern crate hyper;
 use self::hyper::Client;
+
 use std::io::Read;
+
+extern crate json;
 
 pub fn get_status() -> bool {
     let client = Client::new();
 
-    let mut res = client.get("http://gitland.azurewebsites.net:80/api/warheads/status")
+    let mut res = client
+        .get("http://gitland.azurewebsites.net:80/api/warheads/status")
         .send()
         .unwrap();
 
-    let mut api_status = String::new();
-    let result = res.read_to_string(&mut api_status);
-    
-    return api_status == "Online";
+    let mut api_status_json = String::new();
+    let result = res.read_to_string(&mut api_status_json);
+
+    let parsed = json::parse(api_status_json.as_str()).unwrap();
+    let api_status = parsed["Status"] == "Online";
+
+    return api_status;
 }
