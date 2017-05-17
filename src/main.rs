@@ -20,7 +20,7 @@ fn main() {
 
         match last_launch {
             Some(last_launch_time) => {
-                let since_last_launch = last_launch_time - time::now_utc();
+                let since_last_launch = time::now_utc() - last_launch_time;
                 if since_last_launch < launch_cooldown {
                     println!(
                         "Apologies, estimeed President, the minimum cooldown time of {:?} has not been respected, please wait {:?} more seconds",
