@@ -1,3 +1,7 @@
+mod api;
+
 fn main() {
-    println!("Hello, world!");
+    let status = api::get_status();
+
+    println!("{:?}", status);
 }
