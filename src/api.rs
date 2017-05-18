@@ -1,9 +1,4 @@
 extern crate hyper;
-use self::hyper::Client;
-
-use std::result::Result;
-use std::io::Read;
-
 extern crate json;
 
 macro_rules! try_err_string {
@@ -11,8 +6,10 @@ macro_rules! try_err_string {
 }
 
 fn http_get_data(address: &str) -> Result<String, String> {
+    use std::io::Read;
+
     // Make call
-    let http_client = Client::new();
+    let http_client = hyper::Client::new();
     let request_result = http_client.get(address).send();
 
     let mut http_response = try_err_string!(request_result);
@@ -29,6 +26,7 @@ fn http_get_data(address: &str) -> Result<String, String> {
 }
 
 pub fn get_status() -> Result<bool, String> {
+    // Get data
     let status_data_result = http_get_data("http://gitland.azurewebsites.net:80/api/warheads/status");
 
     let api_status_json = try!(status_data_result);
