@@ -1,4 +1,3 @@
-extern crate hyper;
 extern crate json;
 
 macro_rules! try_err_string {
@@ -6,6 +5,7 @@ macro_rules! try_err_string {
 }
 
 fn http_get_data(address: &str) -> Result<String, String> {
+    extern crate hyper;
     use std::io::Read;
 
     // Make call
@@ -16,11 +16,8 @@ fn http_get_data(address: &str) -> Result<String, String> {
 
     // Read response string
     let mut response_data = String::new();
-    let read_to_string_result = http_response.read_to_string(&mut response_data);
 
-    if !read_to_string_result.is_ok() {
-        return Err(read_to_string_result.unwrap_err().to_string());
-    }
+    try_err_string!(http_response.read_to_string(&mut response_data));
 
     return Ok(response_data);
 }
