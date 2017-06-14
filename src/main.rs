@@ -10,11 +10,18 @@ fn main() {
     println!("Salutations, President. Please insert the password to ahniliate (if that's how you spell it) our enemies!");
 
     loop{
-        let mut password;
+        // TODO: handle error.
+        println!("The system is {}", if api::get_status().unwrap() {"online"} else {"offline"});
+
+        let password;
         loop{
-            password = get_password();
-            match password {
-                Ok(_) => {break;},
+            let password_result = get_password();
+            match password_result {
+                Ok(_) => {
+                    // TODO: future stefano's problem.
+                    password = password_result.unwrap();
+                    break;
+                },
                 Err(_) => {},
             }
         }
@@ -34,7 +41,14 @@ fn main() {
             None => {},
         }
         
-        last_launch = Option::Some(time::now_utc());
+        let launch_result = api::launch(&password);
+        match launch_result {
+            Ok(message) => {
+                println!("{}", message);                
+                last_launch = Option::Some(time::now_utc());
+            },
+            Err(message) => println!("ERROR: {}", message),
+        }
     }    
 }
 
