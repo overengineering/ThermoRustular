@@ -12,17 +12,14 @@ use std::io::BufReader;
 
 fn main() {
     let mut last_launch: Option<Tm> = match File::open("last_launch.txt") {
-        Error => None,
         Ok(f) => {
             let mut time = String::new();
 
             BufReader::new(f).read_to_string(&mut time).unwrap();
 
-            match time::strptime(&time, "%+") {
-                Error => None,
-                Ok(t) => Some(t)
-            }
+            time::strptime(&time, "%+").ok()
         }
+        _ => None,
     };
 
     println!("Salutations, President. Please insert the password to ahniliate (if that's how you spell it) our enemies!");
@@ -44,8 +41,10 @@ fn main() {
                     println!("{}", message);
                     last_launch = Option::Some(time::now_utc());
                     match File::open("last_launch.txt") {
-                        Ok(mut f) => {f.write(last_launch.unwrap().rfc3339().to_string().as_bytes());},
-                        Err(_) => ()
+                        Ok(mut f) => {
+                            f.write(last_launch.unwrap().rfc3339().to_string().as_bytes());
+                        }
+                        Err(_) => (),
                     };
                 }
                 Err(message) => println!("ERROR: {}", message),
@@ -94,10 +93,9 @@ fn build_password() -> String {
             Err(_) => {}
         }
     }
-
     let current_date = Local::now();
-    let date_string  = current_date.format("%y%m%d").to_string();
-    let password     = date_string + "-" + &entered_password;
+    let date_string = current_date.format("%y%m%d").to_string();
+    let password = date_string + "-" + &entered_password;
 
     return password;
 }
