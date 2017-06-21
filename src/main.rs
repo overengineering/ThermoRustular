@@ -5,12 +5,27 @@ extern crate chrono;
 use std::io::{self, Write};
 use chrono::prelude::*;
 use time::{Tm, Duration};
+use std::fs::File;
+use std::io::prelude::*;
+
+use std::io::BufReader;
 
 fn main() {
-    let mut last_launch: Option<Tm> = None;
+    let mut last_launch: Option<Tm> = match File::open("last_launch.txt") {
+        Error => None,
+        Ok(f) => {
+            let mut time = String::new();
+
+            BufReader::new(f).read_to_string(&mut time).unwrap();
+
+            match time::strptime(&time, "%+") {
+                Error => None,
+                Ok(t) => Some(t)
+            }
+        }
+    };
 
     println!("Salutations, President. Please insert the password to ahniliate (if that's how you spell it) our enemies!");
-
     loop {
         // TODO: handle error.
         println!("The system is {}",
@@ -28,6 +43,10 @@ fn main() {
                 Ok(message) => {
                     println!("{}", message);
                     last_launch = Option::Some(time::now_utc());
+                    match File::open("last_launch.txt") {
+                        Ok(mut f) => {f.write(last_launch.unwrap().rfc3339().to_string().as_bytes());},
+                        Err(_) => ()
+                    };
                 }
                 Err(message) => println!("ERROR: {}", message),
             }
